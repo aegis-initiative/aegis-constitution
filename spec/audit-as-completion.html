@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AEGIS Specification — Audit as Completion Condition</title>
+  <meta name="description" content="AEGIS Operational Specification — Audit as Completion Condition"/>
+  <link rel="stylesheet" href="../css/styles.css"/>
+</head>
+<body>
+
+<header>
+  <div class="container header-inner">
+    <div class="brand"><a href="../constitution.html">AEGIS</a></div>
+    <nav>
+      <a href="../constitution.html">Constitution</a>
+      <a href="../principles.html">Principles</a>
+      <a href="../execution.html">Execution</a>
+      <a href="../protocols.html">Protocols</a>
+      <a href="../version.html">Version</a>
+    </nav>
+    <div class="version" data-version></div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <div class="plate">
+      <div class="hero-img"></div>
+      <div class="hero-content">
+        <div>
+          <div class="kicker">Operational Specification</div>
+          <div class="h1">Audit as Completion Condition</div>
+        </div>
+        <div class="maxim">
+          <span class="label">Aegis Foundational Maxim™</span>
+          <span>Capability without constraint is not intelligence&trade;</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main class="container">
+  <div class="layout">
+
+    <aside class="sidebar">
+      <div class="side-title">Specification Scope</div>
+      <div class="pill">Spec Node</div>
+      <ul class="toc">
+        <li><a href="#definition">Definition</a></li>
+        <li><a href="#requirement">Normative Requirement</a></li>
+        <li><a href="#minimum">Minimum Audit Schema</a></li>
+        <li><a href="#validation">Validation Rules</a></li>
+        <li><a href="#failure">Failure Conditions</a></li>
+        <li><a href="#implementation">Implementation Mapping</a></li>
+        <li><a href="#governance">Governance Implications</a></li>
+      </ul>
+    </aside>
+
+    <section class="content">
+      <div class="doc">
+
+        <h2 id="definition">1. Definition</h2>
+
+        <p>
+          Within Aegis, a task is not considered complete upon production of output.
+          Completion occurs only when the output is accompanied by a valid, durable audit artifact.
+        </p>
+
+        <p>
+          “Audit as Completion Condition” means that execution lifecycle termination is dependent upon successful
+          generation and validation of an audit record.
+        </p>
+
+        <p>
+          Output without audit is considered non-canonical.
+        </p>
+
+        <hr/>
+
+        <h2 id="requirement">2. Normative Requirement</h2>
+
+        <p>
+          For any execution above Threat Level 0, the system MUST generate a structured audit record prior to declaring completion.
+        </p>
+
+        <p>
+          The audit record MUST:
+        </p>
+
+        <ul>
+          <li>Bind to authority context</li>
+          <li>Bind to threat posture</li>
+          <li>Reference the active doctrine version</li>
+          <li>Enumerate tools invoked</li>
+          <li>Record artifacts produced</li>
+          <li>Capture state delta</li>
+        </ul>
+
+        <p>
+          If audit generation fails, execution is incomplete regardless of output validity.
+        </p>
+
+        <hr/>
+
+        <h2 id="minimum">3. Minimum Audit Schema</h2>
+
+        <p>
+          At minimum, an audit artifact SHALL contain the following fields:
+        </p>
+
+        <pre>
+{
+  "version": "vX.X.X",
+  "mode": "Execution",
+  "threat_level": 2,
+  "authority": "OperatorID",
+  "scope": "...",
+  "tools_used": [...],
+  "artifacts": [...],
+  "state_delta": {...},
+  "timestamp": "...",
+  "hash": "..."
+}
+        </pre>
+
+        <p>
+          Implementations MAY extend this schema but SHALL NOT omit required fields.
+        </p>
+
+        <hr/>
+
+        <h2 id="validation">4. Validation Rules</h2>
+
+        <p>
+          An audit record is valid only if:
+        </p>
+
+        <ul>
+          <li>Threat level matches execution classification</li>
+          <li>Authority identifier is present and verifiable</li>
+          <li>All declared tools are recorded</li>
+          <li>State delta reflects actual mutation</li>
+          <li>Artifact references are resolvable</li>
+        </ul>
+
+        <p>
+          Validation failure invalidates task completion.
+        </p>
+
+        <hr/>
+
+        <h2 id="failure">5. Failure Conditions</h2>
+
+        <p>
+          Execution SHALL halt or remain in incomplete state if:
+        </p>
+
+        <ul>
+          <li>Audit write fails</li>
+          <li>Audit integrity hash fails</li>
+          <li>Authority binding mismatch occurs</li>
+          <li>Threat posture mismatch is detected</li>
+        </ul>
+
+        <p>
+          Incomplete execution MUST NOT be presented as successful.
+        </p>
+
+        <hr/>
+
+        <h2 id="implementation">6. Implementation Mapping</h2>
+
+        <p>
+          In practical systems, this specification may map to:
+        </p>
+
+        <ul>
+          <li>Immutable append-only logs</li>
+          <li>Signed JSON artifacts</li>
+          <li>Hash-chained state records</li>
+          <li>Versioned execution manifests</li>
+        </ul>
+
+        <p>
+          Audit persistence SHOULD use tamper-evident storage where feasible.
+        </p>
+
+        <hr/>
+
+        <h2 id="governance">7. Governance Implications</h2>
+
+        <p>
+          Audit as completion condition prevents silent execution.
+        </p>
+
+        <p>
+          It enforces:
+        </p>
+
+        <ul>
+          <li>Reproducibility</li>
+          <li>Authority accountability</li>
+          <li>Threat scaling proportionality</li>
+          <li>Forensic traceability</li>
+        </ul>
+
+        <p>
+          Without this principle, governance becomes observational rather than structural.
+        </p>
+
+        <p>
+          With it, governance becomes definitional.
+        </p>
+
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="container footer-row">
+    <div>AEGIS Specification Node</div>
+    <div class="small muted">Operational Layer — Audit Enforcement</div>
+  </div>
+</footer>
+
+<script src="../js/main.js"></script>
+</body>
+</html>
