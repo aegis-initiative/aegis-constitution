@@ -9,7 +9,7 @@
     });
     const lab = document.querySelector("[data-maxim-label]");
     const txt = document.querySelector("[data-maxim-text]");
-    if (lab) lab.textContent = v.maxim_label || "Aegis Foundational Maxim™";
+    if (lab) lab.textContent = v.maxim_label || "Aegis Foundational Maxim";
     if (txt) txt.textContent = v.maxim_text || "Capability without constraint is not intelligence";
   } catch (e) {}
 
