@@ -4,7 +4,7 @@
     const res = await fetch("../data/version.json", { cache: "no-store" });
     const v = await res.json();
     document.querySelectorAll("[data-version]").forEach(el => {
-      el.textContent = `${v.version} • ${v.codename}`;
+      el.textContent = `${v.codename} ${v.version}`;
       el.title = `Published: ${v.published} • Authority: ${v.authority}`;
     });
     const lab = document.querySelector("[data-maxim-label]");
