@@ -36,6 +36,20 @@ Designation: Foundational
 
 ---
 
+### v0.1.1 — Preamble Amendment
+
+Amendment to preamble: added Constitutional Articles section enumerating
+the eight foundational articles with one-line constitutional statements.
+
+Rationale: explicit enumeration improves navigability and cross-reference
+clarity for external readers.
+
+No structural changes. No deletions. Canon elaboration unchanged.
+
+Designation: Minor Amendment
+
+---
+
 ## Amendment Rule
 
 Constitutional amendment requires:
