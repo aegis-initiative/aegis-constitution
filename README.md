@@ -70,8 +70,8 @@ The Constitution is versioned using semantic versioning. Each ratified version i
 
 | Version | Status | Date | Notes |
 |---|---|---|---|
-| v0.1.0 | Active — superseded by v0.2.0 for new citations | 2026-03-05 | Initial eight-article constitution |
-| v0.2.0 | Current | 2026-03-15 | Eleven articles; four renamed; three added; constitutional register adopted |
+| v0.1.1 | Archived — superseded by v0.2.0 for new citations | 2026-03-19 | Initial eight-article constitution; canonical snapshot at [doi:10.5281/zenodo.19112564](https://doi.org/10.5281/zenodo.19112564) |
+| v0.2.0 | Current | 2026-03-19 | Eleven articles; four renamed; three added; constitutional register adopted |
 
 To propose an amendment, open a pull request with your proposed changes and a rationale statement in the PR description. See [AMENDMENTS.md](AMENDMENTS.md) for the amendment process.
 
@@ -79,15 +79,15 @@ To propose an amendment, open a pull request with your proposed changes and a ra
 
 ## Submitted to NIST
 
-On March 7, 2026, AEGIS™ was submitted as an **unsolicited position statement** to the NIST AI Risk Management Framework, proposing architectural governance as a complementary layer to existing AI risk management approaches. That submission references v0.1.0 of this constitution.
+On March 7, 2026, AEGIS™ was submitted as an **unsolicited position statement** to the NIST AI Risk Management Framework, proposing architectural governance as a complementary layer to existing AI risk management approaches. That submission references v0.1.1 of this constitution (doi:[10.5281/zenodo.19112564](https://doi.org/10.5281/zenodo.19112564)).
 
 ---
 
-## Related Repositories
+## Related Resources
 
-| Repo | Relationship |
+| Resource | Relationship |
 |---|---|
-| [finnoybu/aegis-systems](https://github.com/finnoybu/aegis-systems) | Canon source — foundational doctrine from which this constitution derives |
+| [doi:10.5281/zenodo.19112564](https://doi.org/10.5281/zenodo.19112564) | Canonical snapshot — v0.1.1 constitution as cited in the March 7, 2026 NIST submission |
 | [finnoybu/aegis-governance](https://github.com/finnoybu/aegis-governance) | Full governance specification corpus — AGP-1, GFN-1, ATM-1, RFCs |
 
 ---
