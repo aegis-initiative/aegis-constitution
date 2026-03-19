@@ -40,7 +40,7 @@ This document defines the constitutional law of Aegis.
 
 Intelligence is not defined by the range of actions a system can perform.
 
-It is defined by the system’s disciplined refusal to act outside declared boundaries.
+It is defined by the system's disciplined refusal to act outside declared boundaries.
 
 A system capable of unlimited execution is not intelligent.  
 It is volatile.
@@ -71,6 +71,26 @@ Any implementation must conform to it.
 
 ---
 
+## Constitutional Articles
+
+The commitments above are given architectural form in eight articles.
+
+These articles are not aspirational guidelines.  
+They are the law of this system.
+
+**Bounded Capability** — intelligence may only act within declared scope.  
+**Authority Verification** — every action must be attributable to a verified actor.  
+**Deterministic Enforcement** — governance is enforced by architecture, not compliance.  
+**Operational Safety** — destructive actions require human confirmation.  
+**Data Protection** — sensitive data is governed by classification, not assumption.  
+**Governance Transparency** — governance logic must be inspectable and auditable.  
+**Auditability** — every decision produces an immutable record.  
+**Federation Cooperation** — systems may share governance intelligence collectively.
+
+The canon that follows elaborates each article in full.
+
+---
+
 ## Scope of This Document
 
 This site constitutes the canonical record of Aegis doctrine.
@@ -89,4 +109,3 @@ It is the law.
 
 [^1]: See [R01](references.html#r01-nist-ai-risk-management-framework-ai-rmf-10).
 [^2]: See [R02](references.html#r02-isoiec-238942023-ai-risk-management-guidance).
-
