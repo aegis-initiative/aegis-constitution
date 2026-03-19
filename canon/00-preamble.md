@@ -1,7 +1,7 @@
 # AEGIS
 ## A Constitutional Framework for Constrained Intelligence
 
-Version: v0.1.0  
+Version: v0.1.1  
 Designation: Constitution  
 Authority: Foundational  
 
