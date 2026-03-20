@@ -1,0 +1,191 @@
+name: Auto Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate CalVer tag
+        id: calver
+        run: |
+          YEAR=$(date +'%y')
+          MONTH=$(date +'%-m')
+          DAY=$(date +'%-d')
+          BASE_TAG="v${YEAR}.${MONTH}.${DAY}"
+
+          COUNT=0
+          TAG=$BASE_TAG
+          while git rev-parse "$TAG" >/dev/null 2>&1; do
+            COUNT=$((COUNT + 1))
+            TAG="${BASE_TAG}.${COUNT}"
+          done
+
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "year=$YEAR" >> $GITHUB_OUTPUT
+          echo "month=$MONTH" >> $GITHUB_OUTPUT
+          echo "day=$DAY" >> $GITHUB_OUTPUT
+          echo "Generated tag: $TAG"
+
+      - name: Get commit hash
+        id: commit
+        run: |
+          HASH=$(git rev-parse --short HEAD)
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+
+      - name: Get commits since last tag
+        id: commits
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LAST_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"- %s" HEAD)
+          else
+            COMMITS=$(git log --pretty=format:"- %s" ${LAST_TAG}..HEAD)
+          fi
+          echo "commits<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMITS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Generate release notes via Claude
+        id: notes
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          RAW_COMMITS='${{ steps.commits.outputs.commits }}'
+
+          RESPONSE=$(curl -s https://api.anthropic.com/v1/messages \
+            -H "x-api-key: $ANTHROPIC_API_KEY" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "content-type: application/json" \
+            -d "$(python3 -c "
+          import json
+          payload = {
+            'model': 'claude-sonnet-4-20250514',
+            'max_tokens': 1024,
+            'messages': [{
+              'role': 'user',
+              'content': 'You are writing release notes for the AEGIS™ Constitution governance documentation site. Convert these raw git commit messages into clear, professional release note entries. Keep them concise and human-readable. Return ONLY a markdown bulleted list, nothing else. No preamble, no explanation, no code fences.\n\nRaw commits:\n' + open('/dev/stdin').read()
+            }]
+          }
+          print(json.dumps(payload))
+          " <<< "$RAW_COMMITS")")
+
+          NOTES=$(echo "$RESPONSE" | python3 -c "
+          import sys, json
+          data = json.load(sys.stdin)
+          print(data['content'][0]['text'])
+          ")
+
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Update release notes file
+        id: update_file
+        run: |
+          YEAR="${{ steps.calver.outputs.year }}"
+          MONTH="${{ steps.calver.outputs.month }}"
+          DAY="${{ steps.calver.outputs.day }}"
+          TAG="${{ steps.calver.outputs.tag }}"
+          HASH="${{ steps.commit.outputs.hash }}"
+
+          FILE="src/content/docs/releases/${YEAR}/${MONTH}.md"
+          mkdir -p "src/content/docs/releases/${YEAR}"
+
+          MONTH_NAME=$(date +'%B')
+          YEAR_FULL=$(date +'%Y')
+
+          python3 - << PYEOF
+import re, os
+
+tag = "${TAG}"
+hash_val = "${HASH}"
+day = "${DAY}"
+file_path = "${FILE}"
+month_name = "${MONTH_NAME}"
+year_full = "${YEAR_FULL}"
+
+notes = """${{ steps.notes.outputs.notes }}"""
+
+new_build_block = f"*Build: {hash_val}*\n{notes}\n"
+new_day_section = f"## {tag}\n\n{new_build_block}\n"
+
+if not os.path.exists(file_path):
+    content = f"""---
+title: "{month_name} {year_full}"
+description: "Release notes for {month_name} {year_full}"
+template: doc
+sidebar:
+  hidden: true
+---
+
+{new_day_section}"""
+    with open(file_path, 'w') as f:
+        f.write(content)
+else:
+    with open(file_path, 'r') as f:
+        content = f.read()
+
+    heading = f"## {tag}"
+
+    if heading in content:
+        # Same day, different build — insert new build block after heading
+        pattern = f'({re.escape(heading)}\n\n)'
+        replacement = f'\\1{new_build_block}\n'
+        content = re.sub(pattern, replacement, content, count=1)
+    else:
+        # New day — prepend before first ## heading after frontmatter
+        match = re.search(r'\n(## )', content)
+        if match:
+            pos = match.start() + 1
+            content = content[:pos] + new_day_section + content[pos:]
+        else:
+            content += f"\n{new_day_section}"
+
+    with open(file_path, 'w') as f:
+        f.write(content)
+
+print(f"Updated {file_path}")
+PYEOF
+
+          echo "file=$FILE" >> $GITHUB_OUTPUT
+
+      - name: Create and push tag
+        run: |
+          TAG="${{ steps.calver.outputs.tag }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG"
+          git push origin "$TAG"
+
+      - name: Create PR with release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.calver.outputs.tag }}"
+          FILE="${{ steps.update_file.outputs.file }}"
+          BRANCH="release/${TAG}-${{ steps.commit.outputs.hash }}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add "$FILE"
+          git commit -m "docs: release notes for ${TAG} (build ${{ steps.commit.outputs.hash }})"
+          git push origin "$BRANCH"
+
+          gh pr create \
+            --title "Release notes: ${TAG} (build ${{ steps.commit.outputs.hash }})" \
+            --body "Auto-generated release notes for ${TAG}. Review and merge to publish to \`/releases/${YEAR}/${MONTH}\`." \
+            --base main \
+            --head "$BRANCH"

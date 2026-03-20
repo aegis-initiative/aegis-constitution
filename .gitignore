@@ -3,6 +3,9 @@ dist/
 # generated types
 .astro/
 
+# VSCode settings
+.vscode/
+
 # dependencies
 node_modules/
 
@@ -20,5 +23,5 @@ pnpm-debug.log*
 # macOS-specific files
 .DS_Store
 
-# Claude agent settings and memory
-.claude/
+# jetbrains setting folder
+.idea/

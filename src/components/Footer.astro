@@ -1,190 +1,123 @@
 ---
-import { execSync } from 'child_process';
-import pkg from '../../package.json';
-
-let commitHash = 'unknown';
-let lastUpdated = 'unknown';
-
-try {
-  commitHash = execSync('git rev-parse --short HEAD').toString().trim();
-  const raw = execSync('git log -1 --format=%cI').toString().trim();
-  const date = new Date(raw);
-  const day = String(date.getUTCDate()).padStart(2, '0');
-  const month = date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
-  const year = date.getUTCFullYear();
-  lastUpdated = `${day} ${month} ${year}`;
-} catch (e) {
-  // build environment without git
-}
-
-const version = `v${pkg.version}`;
 const year = new Date().getFullYear();
+const version = import.meta.env.AEGIS_VERSION ?? 'dev';
+
+const nav = [
+  { label: 'Constitution', href: '/constitution/' },
+  { label: 'Doctrine', href: '/doctrine/' },
+  { label: 'Principles', href: '/principles/' },
+  { label: 'Protocols', href: '/protocols/' },
+  { label: 'About', href: '/about/' },
+  { label: 'Contact', href: '/contact/' },
+  { label: 'Legal', href: '/legal/' },
+  { label: 'Terms', href: '/legal/terms/' },
+  { label: 'Privacy', href: '/legal/privacy/' },
+];
 ---
 
 <footer class="site-footer">
-  <nav class="footer-nav">
-    <a href="/constitution/">Constitution</a>
-    <a href="/doctrine/">Doctrine</a>
-    <a href="/principles/">Principles</a>
-    <a href="/protocols/">Protocols</a>
-    <a href="/about/">About</a>
-    <a href="/contact/">Contact</a>
-    <a href="/legal/">Legal</a>
-    <a href="/legal/terms/">Terms</a>
-    <a href="/legal/privacy/">Privacy</a>
+  <nav class="footer-nav" aria-label="Footer navigation">
+    {nav.map((link) => (
+      <a href={link.href}>{link.label}</a>
+    ))}
   </nav>
   <hr class="footer-divider" />
   <div class="footer-inner">
     <div class="footer-left">
-      <span class="author-line">
-        <span class="phrase">Built and maintained by</span><span class="phrase break-mobile"> <a href="https://finnoybu.github.io/">Ken Tannenbaum</a></span>
+      <span class="footer-author">
+        Built and maintained by <a href="https://finnoybu.github.io/">Ken Tannenbaum</a>
       </span>
-      <span class="footer-meta">Last Updated: {lastUpdated}</span>
-      <span class="footer-meta">Version: {version} ({commitHash})</span>
+      <span class="footer-meta">Version: {version}</span>
     </div>
     <div class="footer-right">
-      <span class="phrase">© {year} <a href="/legal/">AEGIS Initiative</a>. All Rights Reserved.</span>
-      <span class="copyright-line">This site is operated by AEGIS Operations LLC</span>
-      <span class="copyright-line">under license from AEGIS Initiative.</span>
+      <span>© {year} <a href="/legal/">AEGIS Initiative</a>. All Rights Reserved.</span>
+      <span class="footer-meta">This site is operated by AEGIS Operations LLC</span>
+      <span class="footer-meta">under license from AEGIS Initiative.</span>
     </div>
   </div>
 </footer>
 
 <style>
   .site-footer {
-    border-top: 1px solid var(--sl-color-gray-5);
+    border-top: 1px solid var(--color-border-subtle);
     padding: 1.25rem 1.5rem;
-    font-size: var(--sl-text-sm);
-    color: var(--sl-color-gray-3);
-    width: 100%;
-    box-sizing: border-box;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    background-color: var(--color-bg);
   }
 
   .footer-nav {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 0.5rem 2rem;
+    gap: 0.5rem 1.5rem;
     padding-bottom: 1rem;
   }
 
   .footer-nav a {
+    color: var(--color-text-secondary);
+    text-decoration: underline;
     white-space: nowrap;
-    font-size: var(--sl-text-sm);
+    font-size: 0.875rem;
+  }
+
+  .footer-nav a:hover {
+    color: var(--color-accent);
   }
 
   .footer-divider {
     border: none;
-    border-top: 1px solid var(--sl-color-gray-5);
+    border-top: 1px solid var(--color-border-subtle);
     margin: 0 0 1rem;
   }
 
   .footer-inner {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1.5rem;
-    max-width: 72rem;
-    margin: 0 auto;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
   }
 
   .footer-left {
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
-  }
-
-  .footer-meta {
-    font-size: var(--sl-text-xs);
-    color: var(--sl-color-gray-4);
-  }
-
-  .phrase {
-    white-space: nowrap;
-  }
-
-  .break-mobile {
-    display: inline;
+    align-items: center;
   }
 
   .footer-right {
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
-    text-align: right;
-    align-self: center;
+    align-items: center;
   }
 
-  .copyright-line {
-    font-size: var(--sl-text-xs);
-    color: var(--sl-color-gray-4);
-    white-space: nowrap;
-  }
-
-  @media (max-width: 640px) {
-    .footer-inner {
-      flex-direction: column;
-      align-items: center;
-    }
-    .footer-left {
-      align-items: center;
-      text-align: center;
-    }
-    .footer-right {
-      text-align: center;
-    }
-    .break-mobile {
-      display: block;
-    }
-  }
-
-  a {
-    color: var(--sl-color-text-accent);
-    text-decoration: none;
-  }
-
-  a:hover {
+  .footer-author a {
+    color: var(--color-accent);
     text-decoration: underline;
   }
-</style>
 
-<script>
-  function initAccordion() {
-    const sidebar = document.querySelector('.sidebar-content');
-    if (!sidebar) return;
-
-    // Open the group containing the current active page
-    const activeLink = sidebar.querySelector('a[aria-current="page"]');
-    if (activeLink) {
-      const parentDetail = activeLink.closest('details');
-      if (parentDetail) parentDetail.open = true;
-    }
-
-    // Bind accordion — only one group open at a time
-    const bindGroups = () => {
-      const groups = sidebar.querySelectorAll('details');
-      groups.forEach(detail => {
-        if (!detail.dataset.accordionBound) {
-          detail.dataset.accordionBound = 'true';
-          detail.addEventListener('toggle', () => {
-            if (detail.open) {
-              sidebar.querySelectorAll('details').forEach(other => {
-                if (other !== detail && other.open) {
-                  other.open = false;
-                }
-              });
-            }
-          });
-        }
-      });
-    };
-
-    bindGroups();
-
-    const observer = new MutationObserver(bindGroups);
-    observer.observe(sidebar, { childList: true, subtree: true });
+  .footer-meta {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
   }
 
-  document.addEventListener('DOMContentLoaded', initAccordion);
-  document.addEventListener('astro:page-load', initAccordion);
-</script>
+  @media (min-width: 768px) {
+    .footer-inner {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .footer-left {
+      align-items: flex-start;
+    }
+
+    .footer-right {
+      align-items: flex-end;
+      text-align: right;
+    }
+  }
+</style>
