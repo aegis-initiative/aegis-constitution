@@ -8,11 +8,11 @@
 </p>
 
 <p align="center">
+  <a href="https://www.linkedin.com/company/aegis-initiative"><img src="https://img.shields.io/badge/ip--owner-AEGIS%20Initiative-blue?style=flat-square" alt="IP Owner"></a>
   <a href="https://github.com/aegis-initiative"><img src="https://img.shields.io/badge/org-aegis--initiative-0084e7?style=flat-square&logo=github" alt="Org"></a>
-  <a href="https://aegissystems.app"><img src="https://img.shields.io/badge/site-aegissystems.app-0084e7?style=flat-square" alt="Site"></a>
+  <a href="https://doi.org/10.5281/zenodo.19112564"><img src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.19112564-blue?style=flat-square" alt="DOI"></a>
   <img src="https://img.shields.io/github/v/tag/aegis-initiative/aegis-constitution?label=version&style=flat-square&color=C9A84C" alt="Version">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green?style=flat-square" alt="License"></a>
-  <img src="https://img.shields.io/badge/ip--owner-Finnoybu%20IP%20LLC-blueviolet?style=flat-square" alt="IP Owner">
 </p>
 
 ---
