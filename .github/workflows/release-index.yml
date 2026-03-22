@@ -1,0 +1,48 @@
+name: Update Release Index
+
+on:
+  schedule:
+    - cron: '0 5 * * *'  # 5 AM UTC daily (1 AM ET)
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update release index
+        id: update
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python3 scripts/update-release-index.py
+          echo "changed=$(git diff --quiet && echo 'false' || echo 'true')" >> "$GITHUB_OUTPUT"
+
+      - name: Create PR if changed
+        if: steps.update.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DATE=$(date +'%Y-%m-%d')
+          BRANCH="docs/release-index-${DATE}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add src/content/docs/releases/index.md
+          git commit -m "docs: update release index for ${DATE}"
+          git push origin "$BRANCH"
+
+          gh pr create \
+            --title "docs: update release index for ${DATE}" \
+            --body "Nightly update to the releases index page with today's release summary." \
+            --base main \
+            --head "$BRANCH"
