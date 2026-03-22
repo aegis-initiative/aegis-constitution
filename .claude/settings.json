@@ -31,11 +31,24 @@
       "Bash(pkill *)",
       "Bash(mkdir *)",
       "Bash(wc *)",
-      "Bash(cd *)"
+      "Bash(cd *)",
+      "Bash(gh repo:*)",
+      "Bash(gh label:*)",
+      "Bash(npm list:*)",
+      "Bash(node scripts/generate-pdf.mjs --port 4323)",
+      "Bash(node scripts/generate-pdf.mjs)",
+      "Bash(grep '\"\"lockfileVersion\"\"' package-lock.json)",
+      "Bash(gh issue:*)",
+      "Bash(python3 -c \"import yaml; yaml.safe_load\\(open\\(''.github/workflows/release.yml''\\)\\); print\\(''YAML valid''\\)\")",
+      "Bash(gh pr:*)",
+      "Bash(gh auth:*)"
     ],
     "deny": [
       "Bash(git push --force origin main*)",
       "Bash(git push --force-with-lease origin main*)"
+    ],
+    "additionalDirectories": [
+      "d:\\dev\\AEGIS Initiative\\aegis-constitution\\TEMPORARY\\public\\fonts"
     ]
   }
 }
