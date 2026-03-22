@@ -6,21 +6,17 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    # Skip if this is a release notes commit (prevent infinite loop)
-    if: >-
-      github.actor != 'github-actions[bot]' &&
-      !startsWith(github.event.head_commit.message, 'docs: release notes for')
+    # Skip commits from bots (prevent loops)
+    if: github.actor != 'github-actions[bot]'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate CalVer tag
         id: calver
@@ -41,87 +37,41 @@ jobs:
           echo "year=$YEAR" >> "$GITHUB_OUTPUT"
           echo "month=$MONTH" >> "$GITHUB_OUTPUT"
           echo "day=$DAY" >> "$GITHUB_OUTPUT"
-          echo "Generated tag: $TAG"
 
-      - name: Get commit hash
+      - name: Get commit info
         id: commit
         run: |
-          HASH=$(git rev-parse --short HEAD)
-          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+          echo "hash=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          echo "message=$(git log -1 --pretty=format:'%s')" >> "$GITHUB_OUTPUT"
 
-      - name: Get commits since last tag
-        id: commits
-        run: |
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-          if [ -z "$LAST_TAG" ]; then
-            COMMITS=$(git log --pretty=format:"- %s" HEAD)
-          else
-            COMMITS=$(git log --pretty=format:"- %s" "${LAST_TAG}..HEAD")
-          fi
-          {
-            echo "commits<<COMMITS_EOF"
-            echo "$COMMITS"
-            echo "COMMITS_EOF"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Generate release notes via Claude
-        id: notes
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          RAW_COMMITS: ${{ steps.commits.outputs.commits }}
-        run: |
-          NOTES=$(python3 scripts/generate-release-notes.py)
-          {
-            echo "notes<<NOTES_EOF"
-            echo "$NOTES"
-            echo "NOTES_EOF"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Update release notes file
-        env:
-          TAG: ${{ steps.calver.outputs.tag }}
-          HASH: ${{ steps.commit.outputs.hash }}
-          YEAR: ${{ steps.calver.outputs.year }}
-          MONTH: ${{ steps.calver.outputs.month }}
-          DAY: ${{ steps.calver.outputs.day }}
-          NOTES: ${{ steps.notes.outputs.notes }}
-        run: python3 scripts/update-release-notes.py
-
-      - name: Create tag
+      - name: Create and push tag
         run: |
           TAG="${{ steps.calver.outputs.tag }}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag "$TAG"
           git push origin "$TAG"
+          echo "Tagged: $TAG"
 
-      - name: Create release notes PR
+      - name: Append to daily dev log
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HASH: ${{ steps.commit.outputs.hash }}
+          MESSAGE: ${{ steps.commit.outputs.message }}
+          TAG: ${{ steps.calver.outputs.tag }}
+          YEAR: ${{ steps.calver.outputs.year }}
+          MONTH: ${{ steps.calver.outputs.month }}
+          DAY: ${{ steps.calver.outputs.day }}
         run: |
-          TAG="${{ steps.calver.outputs.tag }}"
-          HASH="${{ steps.commit.outputs.hash }}"
-          YEAR="${{ steps.calver.outputs.year }}"
-          MONTH="${{ steps.calver.outputs.month }}"
-          FILE="src/content/docs/releases/${YEAR}/${MONTH}.md"
-          BRANCH="release/${TAG}-${HASH}"
+          python3 scripts/append-dev-log.py
 
+          FILE="src/content/docs/releases/${{ steps.calver.outputs.year }}/${{ steps.calver.outputs.month }}/${{ steps.calver.outputs.day }}.md"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "$FILE"
 
-          # Only proceed if there are changes
           if git diff --cached --quiet; then
-            echo "No release notes changes to commit"
-            exit 0
+            echo "No changes to commit"
+          else
+            git commit -m "docs: dev log entry for ${{ steps.calver.outputs.tag }}"
+            git push origin main
           fi
-
-          git checkout -b "$BRANCH"
-          git commit -m "docs: release notes for ${TAG} (build ${HASH})"
-          git push origin "$BRANCH"
-
-          gh pr create \
-            --title "docs: release notes for ${TAG}" \
-            --body "Auto-generated release notes for ${TAG} (build ${HASH}). Review and merge." \
-            --base main \
-            --head "$BRANCH"
