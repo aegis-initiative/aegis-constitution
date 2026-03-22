@@ -18,31 +18,93 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Run nightly release rollup
-        id: rollup
+      - name: Determine target date
+        id: date
+        run: |
+          # For nightly runs, process yesterday. For manual, process today.
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            TARGET=$(date -d 'yesterday' +'%Y-%m-%d' 2>/dev/null || date -v-1d +'%Y-%m-%d')
+          else
+            TARGET=$(date +'%Y-%m-%d')
+          fi
+          YEAR=$(date -d "$TARGET" +'%y' 2>/dev/null || date -j -f '%Y-%m-%d' "$TARGET" +'%y')
+          MONTH=$(date -d "$TARGET" +'%-m' 2>/dev/null || date -j -f '%Y-%m-%d' "$TARGET" +'%-m')
+          DAY=$(date -d "$TARGET" +'%-d' 2>/dev/null || date -j -f '%Y-%m-%d' "$TARGET" +'%-d')
+
+          echo "target=$TARGET" >> "$GITHUB_OUTPUT"
+          echo "year=$YEAR" >> "$GITHUB_OUTPUT"
+          echo "month=$MONTH" >> "$GITHUB_OUTPUT"
+          echo "day=$DAY" >> "$GITHUB_OUTPUT"
+          echo "Processing date: $TARGET"
+
+      - name: Check for daily branch
+        id: branch
+        run: |
+          YEAR="${{ steps.date.outputs.year }}"
+          MONTH="${{ steps.date.outputs.month }}"
+          DAY="${{ steps.date.outputs.day }}"
+          BRANCH="auto-releases/v${YEAR}.${MONTH}.${DAY}"
+
+          if git ls-remote --heads origin "$BRANCH" | grep -q "$BRANCH"; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+            echo "Found daily branch: $BRANCH"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "No daily branch found for $BRANCH"
+          fi
+
+      - name: Merge daily branch and run rollup
+        if: steps.branch.outputs.found == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          python3 scripts/nightly-release.py
-          echo "changed=$(git diff --quiet && echo 'false' || echo 'true')" >> "$GITHUB_OUTPUT"
-
-      - name: Create PR if changed
-        if: steps.rollup.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          DATE=$(date -d 'yesterday' +'%Y-%m-%d' 2>/dev/null || date -v-1d +'%Y-%m-%d')
-          BRANCH="docs/nightly-release-${DATE}"
+          BRANCH="${{ steps.branch.outputs.branch }}"
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$BRANCH"
+
+          # Merge the daily branch into current checkout
+          git fetch origin "$BRANCH"
+          git merge "origin/$BRANCH" --no-edit
+
+          # Now run the nightly rollup to add release recap + update monthly + index
+          python3 scripts/nightly-release.py
+
+      - name: Create PR
+        if: steps.branch.outputs.found == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TARGET="${{ steps.date.outputs.target }}"
+          PR_BRANCH="docs/nightly-rollup-${TARGET}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Stage any rollup changes
           git add src/content/docs/releases/
-          git commit -m "docs: nightly release rollup for ${DATE}"
-          git push origin "$BRANCH"
+          if git diff --cached --quiet; then
+            echo "No additional rollup changes"
+          else
+            git commit -m "docs: nightly release rollup for ${TARGET}"
+          fi
+
+          # Create PR branch from current state (main + daily branch + rollup)
+          git checkout -b "$PR_BRANCH"
+          git push origin "$PR_BRANCH"
 
           gh pr create \
-            --title "docs: nightly release rollup for ${DATE}" \
-            --body "Nightly release rollup — updates daily log, monthly file, and release index." \
+            --title "docs: release notes for ${TARGET}" \
+            --body "Daily release rollup — dev log, monthly summary, and index update for ${TARGET}. Merge to publish." \
             --base main \
-            --head "$BRANCH"
+            --head "$PR_BRANCH"
+
+          echo "Created PR for $TARGET"
+
+      - name: Clean up daily branch
+        if: steps.branch.outputs.found == 'true'
+        run: |
+          BRANCH="${{ steps.branch.outputs.branch }}"
+          git push origin --delete "$BRANCH" 2>/dev/null || echo "Branch already deleted"
+          echo "Cleaned up $BRANCH"
