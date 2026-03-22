@@ -1,0 +1,34 @@
+# AEGIS™ Constitution Code Owners
+
+Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+---
+
+# Default Repository Owner(s)
+* @finnoybu
+
+# Constitutional Text (locked/protected articles)
+/src/content/docs/constitution/ @finnoybu
+/src/content/docs/doctrine/ @finnoybu
+/src/content/docs/principles/ @finnoybu
+/src/content/docs/protocols/ @finnoybu
+
+# Legal Pages
+/src/content/docs/legal/ @finnoybu
+
+# Site Components and Layout
+/src/components/ @finnoybu
+/src/layouts/ @finnoybu
+/src/pages/ @finnoybu
+
+# Build and Deploy
+/scripts/ @finnoybu
+/package.json @finnoybu
+
+# GitHub Configuration and Automation
+/.github/ @finnoybu
+
+# Root Governance Files
+/CLAUDE.md @finnoybu
+/README.md @finnoybu
+/CODEOWNERS @finnoybu

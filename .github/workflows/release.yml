@@ -11,11 +11,14 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    # Skip if the commit was made by this workflow (prevent infinite loop)
+    if: github.actor != 'github-actions[bot]'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate CalVer tag
         id: calver
@@ -73,7 +76,6 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Update release notes file
-        id: update_file
         env:
           TAG: ${{ steps.calver.outputs.tag }}
           HASH: ${{ steps.commit.outputs.hash }}
@@ -81,38 +83,43 @@ jobs:
           MONTH: ${{ steps.calver.outputs.month }}
           DAY: ${{ steps.calver.outputs.day }}
           NOTES: ${{ steps.notes.outputs.notes }}
-        run: |
-          python3 scripts/update-release-notes.py
-          echo "file=src/content/docs/releases/${YEAR}/${MONTH}.md" >> "$GITHUB_OUTPUT"
+        run: python3 scripts/update-release-notes.py
 
-      - name: Create and push tag
+      - name: Create tag
         run: |
           TAG="${{ steps.calver.outputs.tag }}"
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag "$TAG"
           git push origin "$TAG"
 
-      - name: Create PR with release notes
+      - name: Create release notes PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="${{ steps.calver.outputs.tag }}"
-          FILE="${{ steps.update_file.outputs.file }}"
+          HASH="${{ steps.commit.outputs.hash }}"
           YEAR="${{ steps.calver.outputs.year }}"
           MONTH="${{ steps.calver.outputs.month }}"
-          HASH="${{ steps.commit.outputs.hash }}"
+          FILE="src/content/docs/releases/${YEAR}/${MONTH}.md"
           BRANCH="release/${TAG}-${HASH}"
 
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$BRANCH"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "$FILE"
+
+          # Only proceed if there are changes
+          if git diff --cached --quiet; then
+            echo "No release notes changes to commit"
+            exit 0
+          fi
+
+          git checkout -b "$BRANCH"
           git commit -m "docs: release notes for ${TAG} (build ${HASH})"
           git push origin "$BRANCH"
 
           gh pr create \
-            --title "Release notes: ${TAG} (build ${HASH})" \
-            --body "Auto-generated release notes for ${TAG}. Review and merge to publish to \`/releases/${YEAR}/${MONTH}\`." \
+            --title "docs: release notes for ${TAG}" \
+            --body "Auto-generated release notes for ${TAG} (build ${HASH}). Review and merge." \
             --base main \
             --head "$BRANCH"
