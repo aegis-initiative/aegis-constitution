@@ -53,7 +53,7 @@ jobs:
           git push origin "$TAG"
           echo "Tagged: $TAG"
 
-      - name: Append to daily dev log
+      - name: Append to daily dev log on auto-releases branch
         env:
           HASH: ${{ steps.commit.outputs.hash }}
           MESSAGE: ${{ steps.commit.outputs.message }}
@@ -62,16 +62,29 @@ jobs:
           MONTH: ${{ steps.calver.outputs.month }}
           DAY: ${{ steps.calver.outputs.day }}
         run: |
-          python3 scripts/append-dev-log.py
+          BRANCH="auto-releases/v${YEAR}.${MONTH}.${DAY}"
 
-          FILE="src/content/docs/releases/${{ steps.calver.outputs.year }}/${{ steps.calver.outputs.month }}/${{ steps.calver.outputs.day }}.md"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Create or switch to the daily branch
+          if git ls-remote --heads origin "$BRANCH" | grep -q "$BRANCH"; then
+            git fetch origin "$BRANCH"
+            git checkout "$BRANCH"
+            git merge main --no-edit
+          else
+            git checkout -b "$BRANCH"
+          fi
+
+          python3 scripts/append-dev-log.py
+
+          FILE="src/content/docs/releases/${YEAR}/${MONTH}/${DAY}.md"
           git add "$FILE"
 
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "docs: dev log entry for ${{ steps.calver.outputs.tag }}"
-            git push origin main
+            git commit -m "docs: dev log entry for ${TAG}"
+            git push origin "$BRANCH"
+            echo "Pushed dev log to $BRANCH"
           fi
