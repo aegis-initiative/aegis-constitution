@@ -40,6 +40,37 @@ import AegisWordmark from '../components/AegisWordmark.astro';
         document.documentElement.dataset.theme = stored || preferred;
       })();
     </script>
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "name": "AEGIS Constitution",
+          "url": "https://aegis-constitution.com"
+        },
+        {
+          "@type": "CreativeWork",
+          "name": "AEGIS Constitution",
+          "url": "https://aegis-constitution.com",
+          "author": {
+            "@type": "Person",
+            "name": "Kenneth Tannenbaum"
+          },
+          "datePublished": "2026-03-22",
+          "license": "https://www.apache.org/licenses/LICENSE-2.0",
+          "publisher": {
+            "@type": "Organization",
+            "name": "AEGIS Initiative",
+            "url": "https://aegis-initiative.com"
+          },
+          "description": "The canonical governance charter for constrained intelligence — versioned, citeable, and openly licensed"
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <Header />
