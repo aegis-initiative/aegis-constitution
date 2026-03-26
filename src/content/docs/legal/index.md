@@ -1,6 +1,6 @@
 ---
 title: Legal
-description: Copyright, trademark, and licensing information for the AEGIS™ Constitution
+description: Copyright, trademark, and licensing information for the AEGIS Constitution
 template: doc
 ---
 
@@ -44,7 +44,7 @@ For additional restrictions on use of AEGIS marks and content, see [Acceptable U
 
 ## License
 
-The AEGIS™ Constitution and all content in this repository are released under the **Apache License 2.0**.
+The AEGIS Constitution and all content in this repository are released under the **Apache License 2.0**.
 
 ```
 Licensed under the Apache License, Version 2.0 (the "License");

@@ -1,6 +1,6 @@
 ---
 title: Contact
-description: How to reach the AEGIS™ Initiative — questions, contributions, and community
+description: How to reach the AEGIS Initiative — questions, contributions, and community
 template: doc
 ---
 
@@ -35,7 +35,7 @@ For specific, actionable items — errors in the text, broken links, or technica
 
 ## Contributing
 
-The AEGIS™ Constitution is an open standard. Amendments are proposed through the RFC process — open a pull request with your proposed change and a rationale statement in the PR description. The amendment process is documented in the [Amendments](/constitution/amendments/) section.
+The AEGIS Constitution is an open standard. Amendments are proposed through the RFC process — open a pull request with your proposed change and a rationale statement in the PR description. The amendment process is documented in the [Amendments](/constitution/amendments/) section.
 
 All contributions must be made by humans. No amendment may be initiated, drafted, or approved by an AI system acting autonomously. Constitutional change is a human act.
 

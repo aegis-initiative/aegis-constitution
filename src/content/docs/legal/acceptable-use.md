@@ -1,6 +1,6 @@
 ---
 title: Acceptable Use Policy
-description: Acceptable use policy for the AEGIS™ Constitution site and related materials
+description: Acceptable use policy for the AEGIS Constitution site and related materials
 template: doc
 ---
 
@@ -22,7 +22,7 @@ Automated access to this site is permitted only within the bounds of the site's 
 
 ## Content Use Restrictions
 
-The AEGIS™ Constitution is licensed under the [Apache License 2.0](/legal/#license). Within that license, the following restrictions apply:
+The AEGIS Constitution is licensed under the [Apache License 2.0](/legal/#license). Within that license, the following restrictions apply:
 
 - **No misrepresentation.** You may not present AEGIS™ content as your own original work, remove attribution, or alter content in ways that misrepresent the AEGIS Initiative's positions.
 - **No unauthorized redistribution.** Redistribution must comply with Apache 2.0 requirements — including retention of copyright notices, license text, and clear marking of modifications.
@@ -36,7 +36,7 @@ For trademark restrictions, see [Copyright, Trademark & License](/legal/).
 
 You may not:
 
-- Claim that a system, product, or service is "AEGIS-compliant" or "AEGIS-certified" without meeting the requirements defined in the AEGIS™ Constitution
+- Claim that a system, product, or service is "AEGIS-compliant" or "AEGIS-certified" without meeting the requirements defined in the AEGIS Constitution
 - Use AEGIS™ marks to imply endorsement or affiliation with the AEGIS Initiative without written permission
 - Represent unofficial implementations as authoritative AEGIS governance systems
 

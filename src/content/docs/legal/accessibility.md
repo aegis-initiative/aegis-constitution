@@ -1,6 +1,6 @@
 ---
 title: Accessibility Statement
-description: Accessibility conformance statement for the AEGIS™ Constitution site
+description: Accessibility conformance statement for the AEGIS Constitution site
 template: doc
 ---
 

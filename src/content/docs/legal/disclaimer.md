@@ -1,6 +1,6 @@
 ---
 title: Disclaimer
-description: Disclaimer for the AEGIS™ Constitution site
+description: Disclaimer for the AEGIS Constitution site
 template: doc
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Terms of Use
-description: Terms of use for the AEGIS™ Constitution site
+description: Terms of use for the AEGIS Constitution site
 template: doc
 ---
 

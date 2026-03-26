@@ -34,7 +34,7 @@ For copyright, trademark, and licensing details, see [Copyright, Trademark & Lic
 
 Kenneth Tannenbaum  
 Founder, Finnoybu Holdings LLC  
-Principal Architect, AEGIS™ Initiative
+Principal Architect, AEGIS Initiative
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Privacy Policy
-description: Privacy policy for the AEGIS™ Constitution site
+description: Privacy policy for the AEGIS Constitution site
 template: doc
 ---
 

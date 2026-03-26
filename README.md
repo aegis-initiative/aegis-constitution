@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src/assets/AEGIS_logo_aegis-constitution.svg" width="80" alt="AEGIS™ Constitution">
+  <img src="src/assets/AEGIS_logo_aegis-constitution.svg" width="80" alt="AEGIS Constitution">
 </p>
 
 <p align="center">
@@ -19,7 +19,7 @@
 
 ## Overview
 
-This repository contains the **AEGIS™ Constitution** — the authoritative governance charter defining the foundational principles, architectural requirements, and constitutional commitments for all AEGIS™-compliant systems.
+This repository contains the **AEGIS Constitution** — the authoritative governance charter defining the foundational principles, architectural requirements, and constitutional commitments for all AEGIS™-compliant systems.
 
 The Constitution is the public, canonical reference that external parties, researchers, policymakers, and implementers can cite, audit, and build upon.
 
@@ -29,7 +29,7 @@ The Constitution is the public, canonical reference that external parties, resea
 
 ## The Eleven Constitutional Articles
 
-The AEGIS™ Constitution establishes eleven foundational governance principles, each of which constitutes an architectural requirement — not an aspirational guideline:
+The AEGIS Constitution establishes eleven foundational governance principles, each of which constitutes an architectural requirement — not an aspirational guideline:
 
 | Article | Principle | One-Line Commitment |
 |---|---|---|

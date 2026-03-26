@@ -1,11 +1,11 @@
 ---
 title: References
-description: Normative bibliography for the AEGIS™ Constitution, Doctrine, Principles, and Protocols
+description: Normative bibliography for the AEGIS Constitution, Doctrine, Principles, and Protocols
 sidebar:
   hidden: true
 ---
 
-This page collects all normative references cited across the AEGIS™ Constitution and related documents. Citations use IEEE style. Each reference includes the articles in which it appears.
+This page collects all normative references cited across the AEGIS Constitution and related documents. Citations use IEEE style. Each reference includes the articles in which it appears.
 
 ---
 

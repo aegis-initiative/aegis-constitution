@@ -1,6 +1,6 @@
 ---
 title: Cookie Policy
-description: Cookie policy for the AEGIS™ Constitution site
+description: Cookie policy for the AEGIS Constitution site
 template: doc
 ---
 
