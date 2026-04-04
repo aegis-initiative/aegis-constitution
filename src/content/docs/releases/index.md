@@ -7,6 +7,11 @@ sidebar:
 
 ## 2026
 
+
+### [April](/releases/26/4/)
+
+- [v26.4.3](/releases/26/4/#release--v2643) — docs: dev log entry for v26.4.2 (#59) (47ac54f)
+
 ### [March](/releases/26/3/)
 
 - [v26.3.27](/releases/26/3/#release--v26327) — chore: switch license from Apache 2.0 to CC-BY-SA-4.0 (23e9272)
