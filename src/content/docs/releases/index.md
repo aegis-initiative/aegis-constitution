@@ -10,7 +10,7 @@ sidebar:
 
 ### [April](/releases/26/4/)
 
-- [v26.4.10](/releases/26/4/#release--v26410) — I don't see any release notes in your message. Could you please provide the release notes you'd like me to summarize?
+- [v26.4.10](/releases/26/4/#release--v26410) — docs: release notes for 2026-04-09 (#69) (4006ad4)
 - [v26.4.3](/releases/26/4/#release--v2643) — docs: dev log entry for v26.4.2 (#59) (47ac54f)
 
 ### [March](/releases/26/3/)
