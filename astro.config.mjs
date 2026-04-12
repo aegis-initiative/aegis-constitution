@@ -1,52 +1,51 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
-import { execSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
 
 /**
- * Resolve the CalVer version at build time from the latest release tag.
+ * Resolve the site version from the committed VERSION file.
  *
- * Version scheme:
- *   vYY.M.D.N  (4-part) — development log snapshot, per-push
- *   vYY.M.D    (3-part) — release, created by the nightly rollup
+ * VERSION is a JSON file at the repo root, written by the nightly
+ * release rollup (scripts/nightly-release.py) every time a 3-part
+ * release tag is cut. Shape:
  *
- * The header only displays releases. We filter the tag list to 3-part
- * tags only and return the most recent one by version-sort order.
+ *   {
+ *     "tag": "v26.4.12",
+ *     "commit": "17ef278",
+ *     "released_at": "2026-04-12T10:29:29Z"
+ *   }
  *
- * This ensures the header reflects the most recent *released* day, not
- * whatever was just pushed mid-day. A day in progress stays invisible
- * until its nightly rollup cuts the release tag.
+ * Why a file and not git tags:
+ *   1. Works under shallow clones (Cloudflare Pages, etc.)
+ *   2. No shell, no globs, no cross-platform quoting
+ *   3. Release notes, version file, and tag are committed together
+ *      in the nightly rollup — they never disagree
+ *   4. Auditable via `git log VERSION`
+ *   5. Usable by other tools (CI, Docker, deploy scripts) that need
+ *      to know the current version without invoking git
  *
- * Local dev can override by setting AEGIS_VERSION in the shell before
- * running `astro dev`. Falls back to 'dev' if no release tags exist.
+ * The header component reads `import.meta.env.AEGIS_VERSION`, which
+ * is populated here by mutating `process.env` before Astro's Vite
+ * loader runs.
  */
-function resolveVersionFromGit() {
+function resolveVersion() {
   try {
-    // No glob argument — Windows cmd.exe doesn't strip single quotes
-    // around 'v*', which makes git match a literal string and return
-    // nothing. Filter the full tag list with the regex instead.
-    const tags = execSync(
-      'git tag --sort=-version:refname',
-      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] },
-    ).trim().split('\n');
-
-    // Match only 3-part release tags (vYY.M.D), reject 4-part dev logs
-    const releaseTag = tags.find((t) => /^v\d+\.\d+\.\d+$/.test(t.trim()));
-    return releaseTag ? releaseTag.trim() : null;
+    const here = dirname(fileURLToPath(import.meta.url));
+    const raw = readFileSync(resolve(here, 'VERSION'), 'utf8');
+    const parsed = JSON.parse(raw);
+    return parsed.tag || 'dev';
   } catch {
-    return null;
+    // No VERSION file yet (fresh clone on a branch that predates the
+    // rollup, or local dev without any release). Show 'dev' rather
+    // than failing the build.
+    return 'dev';
   }
 }
 
-// Force git-derived version as the authoritative source. This
-// overrides any .env file or dashboard-configured environment value
-// that might otherwise go stale between releases.
-const gitVersion = resolveVersionFromGit();
-if (gitVersion) {
-  process.env.AEGIS_VERSION = gitVersion;
-} else if (!process.env.AEGIS_VERSION) {
-  process.env.AEGIS_VERSION = 'dev';
-}
+process.env.AEGIS_VERSION = resolveVersion();
 
 // https://astro.build/config
 export default defineConfig({
