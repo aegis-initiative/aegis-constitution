@@ -289,6 +289,14 @@ npm run build    # Production build to ./dist/
 npm run preview  # Preview production build locally
 ```
 
+**Node/npm versions are pinned.** Use Node 22.x LTS with npm 10.9.x. The repo
+enforces this via `.nvmrc` (run `nvm use` to switch) and the `engines` field in
+`package.json`. Do **not** regenerate `package-lock.json` under npm 11 — npm 11
+and npm 10 serialize optional peer dependencies differently, and a lockfile
+produced by npm 11 will fail `npm ci` on Cloudflare Pages with
+`Missing: @types/node@X.X.X from lock file`. See
+[`.claude/rules/`](./.claude/rules/) for more guardrails.
+
 Deployment is automatic via Cloudflare Pages on push to `main`.
 Build command: `npm run build` | Output: `dist/` | Root: `` (repo root)
 
