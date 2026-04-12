@@ -250,14 +250,21 @@ import AegisWordmark from '@aegis-initiative/design-system/components/AegisWordm
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8rem;
+    gap: 3rem;
     max-width: 72rem;
     width: 100%;
+  }
+
+  @media (min-width: 1200px) {
+    .hero {
+      gap: 8rem;
+    }
   }
 
   .hero-text {
     flex: 1;
     max-width: 36rem;
+    min-width: 0;
   }
 
   .hero-title {
@@ -267,6 +274,12 @@ import AegisWordmark from '@aegis-initiative/design-system/components/AegisWordm
     line-height: 1.15;
     color: var(--color-text);
     margin-bottom: 1rem;
+  }
+
+  @media (max-width: 1200px) {
+    .hero-title {
+      font-size: 3.25rem;
+    }
   }
 
   .hero-tagline {
@@ -329,7 +342,17 @@ import AegisWordmark from '@aegis-initiative/design-system/components/AegisWordm
 
   .hero-wordmark :global(.aegis-wordmark) {
     display: block;
+    max-width: 100%;
+    height: auto;
   }
+
+  /* Shrink wordmark progressively on narrower widths */
+  @media (max-width: 1200px) {
+    .hero-wordmark :global(.aegis-wordmark) {
+      width: 300px;
+    }
+  }
+
 
   /* ── Footer wrapper ────────────────────────────────────────── */
   .splash-footer {
@@ -340,7 +363,11 @@ import AegisWordmark from '@aegis-initiative/design-system/components/AegisWordm
   }
 
   /* ── Responsive ────────────────────────────────────────────── */
-  @media (max-width: 768px) {
+  @media (max-width: 960px) {
+    .splash {
+      padding: 2rem 1.25rem;
+    }
+
     .hero {
       flex-direction: column;
       text-align: center;
@@ -369,22 +396,50 @@ import AegisWordmark from '@aegis-initiative/design-system/components/AegisWordm
 
     .hero-wordmark :global(.aegis-wordmark) {
       width: 280px;
-      height: auto;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .hero-title {
+      font-size: 2.5rem;
     }
   }
 
   @media (max-width: 480px) {
+    .splash {
+      padding: 1.5rem 1rem;
+    }
+
     .hero-title {
-      font-size: 2.25rem;
+      font-size: 2rem;
     }
 
     .hero-tagline {
       font-size: 1rem;
     }
 
+    .hero-actions {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.75rem;
+    }
+
+    .hero-actions .btn {
+      justify-content: center;
+    }
+
     .hero-wordmark :global(.aegis-wordmark) {
       width: 200px;
-      height: auto;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .hero-title {
+      font-size: 1.75rem;
+    }
+
+    .hero-wordmark :global(.aegis-wordmark) {
+      width: 160px;
     }
   }
 </style>
