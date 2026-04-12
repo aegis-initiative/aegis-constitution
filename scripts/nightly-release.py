@@ -1,22 +1,37 @@
 #!/usr/bin/env python3
 """
-Nightly release rollup — runs after the day's work is done.
+Nightly release rollup — runs at the start of the next day to seal
+the previous day's development work as a release.
 
-1. Reads today's daily dev log
-2. Generates a release summary via Claude API
-3. Prepends release recap to the top of the daily log
-4. Adds/updates entry in the monthly release file
-5. Adds/updates entry in the release index
+Steps:
+  1. Read the previous day's daily development log
+  2. Extract dev log entries verbatim (the dev log IS the release summary)
+  3. Prepend a release recap to the top of the daily log
+  4. Add/update the release entry in the monthly release file
+  5. Add/update the entry in the release index
+  6. Create the 3-part release tag (vYY.M.D) pointing at the commit of
+     the last 4-part dev log tag of that day
+  7. Push the release tag to origin
 
-Environment variables:
-  ANTHROPIC_API_KEY — for generating summaries (optional, falls back to first commit)
+Version scheme:
+  vYY.M.D.N  (4-part) — development log snapshot, created on every push
+  vYY.M.D    (3-part) — release, created here by rolling up the day's work
+
+The rollup is idempotent — existing release entries and tags are
+preserved and re-runs on the same date are safe.
+
+CLI:
+  --year YY   (required) two-digit year, e.g. 26
+  --month M   (required, 1-12, no leading zero)
+  --day D     (required, 1-31, no leading zero)
 """
 
+import argparse
 import os
 import re
 import subprocess
 import sys
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 
 
 def run(cmd):
@@ -24,18 +39,70 @@ def run(cmd):
     return result.stdout.strip()
 
 
-def get_yesterday():
-    """Get yesterday's date (since this runs at 5 AM UTC, we want the previous day)."""
-    yesterday = datetime.now(timezone.utc) - timedelta(hours=6)
-    return yesterday
+def parse_args():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--year", required=True, help="Two-digit year (e.g. 26)")
+    parser.add_argument("--month", required=True, help="Month (1-12, no leading zero)")
+    parser.add_argument("--day", required=True, help="Day (1-31, no leading zero)")
+    return parser.parse_args()
 
 
-def get_tags_for_date(year, month, day):
-    """Find all CalVer tags for a specific date."""
-    prefix = f"v{year}.{month}.{day}"
-    all_tags = run("git tag --list 'v*'").split("\n")
-    tags = [t for t in all_tags if t.strip() and (t == prefix or t.startswith(prefix + "."))]
-    return sorted(tags)
+def get_dev_log_tags(year, month, day):
+    """Find all 4-part development log tags for a specific date.
+
+    Returns tags of the form vYY.M.D.N sorted by N.
+    The 3-part release tag (vYY.M.D) is excluded — it's created by
+    this script, not by individual pushes.
+    """
+    prefix = f"v{year}.{month}.{day}."
+    # Use list form (no shell=True) so the glob doesn't get mangled by
+    # Windows cmd.exe when running locally.
+    result = subprocess.run(
+        ["git", "tag", "--list", "v*"],
+        capture_output=True, text=True,
+    )
+    all_tags = result.stdout.strip().split("\n")
+    pattern = re.compile(rf"^{re.escape(prefix)}\d+$")
+    tags = [t for t in all_tags if t.strip() and pattern.match(t)]
+    # Sort numerically by the trailing counter
+    tags.sort(key=lambda t: int(t.rsplit(".", 1)[-1]))
+    return tags
+
+
+def create_release_tag(release_tag, source_tag):
+    """Create the 3-part release tag pointing at source_tag's commit.
+
+    Idempotent: if release_tag already exists, log and skip.
+    Returns True if the tag was newly created.
+    """
+    existing = run(f"git rev-parse --verify --quiet refs/tags/{release_tag}")
+    if existing:
+        print(f"Release tag {release_tag} already exists — skipping creation")
+        return False
+
+    commit = run(f"git rev-list -n 1 {source_tag}")
+    if not commit:
+        print(f"Could not resolve commit for {source_tag}", file=sys.stderr)
+        return False
+
+    result = subprocess.run(
+        f"git tag {release_tag} {commit}",
+        shell=True, capture_output=True, text=True,
+    )
+    if result.returncode != 0:
+        print(f"Failed to create tag {release_tag}: {result.stderr}", file=sys.stderr)
+        return False
+
+    push_result = subprocess.run(
+        f"git push origin {release_tag}",
+        shell=True, capture_output=True, text=True,
+    )
+    if push_result.returncode != 0:
+        print(f"Failed to push tag {release_tag}: {push_result.stderr}", file=sys.stderr)
+        return False
+
+    print(f"Created and pushed release tag {release_tag} → {commit[:7]}")
+    return True
 
 
 def get_builds_range(tags):
@@ -47,105 +114,29 @@ def get_builds_range(tags):
     return first_hash, last_hash
 
 
-def generate_summary(dev_log_content):
-    """Generate release summary from dev log using Claude API."""
-    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+def extract_dev_log_entries(dev_log_content):
+    """Extract bullet entries from the day's development log.
 
-    # Extract dev log entries (lines starting with -)
+    The development log IS the release summary — we copy its entries
+    verbatim into the release rollup. No AI summarization, no rewriting.
+    What the user committed is what gets published.
+    """
     entries = [l.strip() for l in dev_log_content.split("\n") if l.strip().startswith("- ")]
-    if not entries:
-        return ["- Updates and improvements"]
-
-    if not api_key:
-        return entries[:10]  # Fallback: use raw entries
-
-    import json
-    import urllib.request
-
-    raw_entries = "\n".join(entries)
-
-    payload = {
-        "model": "claude-sonnet-4-20250514",
-        "max_tokens": 1024,
-        "messages": [
-            {
-                "role": "user",
-                "content": (
-                    "You are writing release notes for the AEGIS™ Constitution "
-                    "governance documentation site. Convert these development log "
-                    "entries into clear, concise release note bullet points. "
-                    "Group related changes. Remove commit hashes and PR numbers. "
-                    "Return ONLY a markdown bulleted list, nothing else.\n\n"
-                    "Dev log entries:\n" + raw_entries
-                ),
-            }
-        ],
-    }
-
-    req = urllib.request.Request(
-        "https://api.anthropic.com/v1/messages",
-        data=json.dumps(payload).encode("utf-8"),
-        headers={
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
-        },
-    )
-
-    try:
-        with urllib.request.urlopen(req) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            text = data["content"][0]["text"].strip()
-            return [l.strip() for l in text.split("\n") if l.strip().startswith("- ")]
-    except Exception as e:
-        print(f"Warning: Claude API call failed ({e}), using raw entries", file=sys.stderr)
-        return entries[:10]
+    return entries or ["- No substantive changes"]
 
 
-def generate_index_summary(release_entries):
-    """Generate a one-line summary for the release index."""
-    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+def derive_index_summary(release_entries):
+    """Derive a one-line index summary from the first release entry.
 
-    raw = "\n".join(release_entries)
-
-    if not api_key:
-        # Fallback: first entry without the dash
-        return release_entries[0].lstrip("- ")[:80] if release_entries else "Updates"
-
-    import json
-    import urllib.request
-
-    payload = {
-        "model": "claude-sonnet-4-20250514",
-        "max_tokens": 100,
-        "messages": [
-            {
-                "role": "user",
-                "content": (
-                    "Summarize these release notes into a single concise phrase "
-                    "(under 80 chars) for a release index. No period at the end. "
-                    "Return ONLY the phrase.\n\n" + raw
-                ),
-            }
-        ],
-    }
-
-    req = urllib.request.Request(
-        "https://api.anthropic.com/v1/messages",
-        data=json.dumps(payload).encode("utf-8"),
-        headers={
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
-        },
-    )
-
-    try:
-        with urllib.request.urlopen(req) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            return data["content"][0]["text"].strip()
-    except Exception:
-        return release_entries[0].lstrip("- ")[:80] if release_entries else "Updates"
+    Strips the leading dash and any trailing commit hash in parens,
+    then truncates to 80 chars.
+    """
+    if not release_entries:
+        return "Updates"
+    first = release_entries[0].lstrip("- ").strip()
+    # Strip trailing " (abc1234)" commit hash marker
+    first = re.sub(r"\s*\([a-f0-9]{7,}\)\s*$", "", first)
+    return first[:80]
 
 
 def update_daily_log(file_path, tag, builds_str, release_entries):
@@ -154,7 +145,7 @@ def update_daily_log(file_path, tag, builds_str, release_entries):
         print(f"No daily log found at {file_path}")
         return False
 
-    with open(file_path, "r") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
 
     # Check if release recap already exists
@@ -177,7 +168,7 @@ def update_daily_log(file_path, tag, builds_str, release_entries):
     else:
         content = content + "\n\n" + recap
 
-    with open(file_path, "w") as f:
+    with open(file_path, "w", encoding="utf-8") as f:
         f.write(content)
 
     print(f"Added release recap to {file_path}")
@@ -213,11 +204,11 @@ sidebar:
 ---
 
 {new_section}"""
-        with open(file_path, "w") as f:
+        with open(file_path, "w", encoding="utf-8") as f:
             f.write(content)
         print(f"Created {file_path}")
     else:
-        with open(file_path, "r") as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
 
         if f"## Release / {tag}" in content:
@@ -231,7 +222,7 @@ sidebar:
         else:
             content = content + "\n\n" + new_section
 
-        with open(file_path, "w") as f:
+        with open(file_path, "w", encoding="utf-8") as f:
             f.write(content)
         print(f"Updated {file_path}")
 
@@ -244,7 +235,7 @@ def update_index(year, month, tag, summary):
         print(f"Error: {index_path} not found", file=sys.stderr)
         return
 
-    with open(index_path, "r") as f:
+    with open(index_path, "r", encoding="utf-8") as f:
         content = f.read()
 
     base_tag = tag.split(".")[0] + "." + tag.split(".")[1] + "." + tag.split(".")[2]
@@ -281,56 +272,56 @@ def update_index(year, month, tag, summary):
 
         print(f"Added index entry for {base_tag}")
 
-    with open(index_path, "w") as f:
+    with open(index_path, "w", encoding="utf-8") as f:
         f.write(content)
 
 
 def main():
-    dt = get_yesterday()
-    year = dt.strftime("%y")
-    month = str(dt.month)
-    day = str(dt.day)
+    args = parse_args()
+    year = args.year
+    month = args.month
+    day = args.day
 
-    print(f"Processing releases for {dt.strftime('%Y-%m-%d')} ({year}.{month}.{day})")
+    print(f"Processing releases for 20{year}-{int(month):02d}-{int(day):02d} (v{year}.{month}.{day})")
 
-    tags = get_tags_for_date(year, month, day)
-    if not tags:
-        print("No tags found for this date. Nothing to do.")
+    dev_tags = get_dev_log_tags(year, month, day)
+    if not dev_tags:
+        print("No development log tags found for this date. Nothing to do.")
         sys.exit(0)
 
-    print(f"Found {len(tags)} tag(s): {', '.join(tags)}")
+    print(f"Found {len(dev_tags)} dev log tag(s): {', '.join(dev_tags)}")
 
-    # Use the base tag (without micro-version suffix) for the release
-    base_tag = f"v{year}.{month}.{day}"
+    # The release tag for this day
+    release_tag = f"v{year}.{month}.{day}"
 
-    # Get build hashes
-    first_hash, last_hash = get_builds_range(tags)
-    if first_hash == last_hash:
-        builds_str = first_hash
-    else:
-        builds_str = f"{first_hash} – {last_hash}"
+    # Get build hashes from the first and last dev log tags
+    first_hash, last_hash = get_builds_range(dev_tags)
+    builds_str = first_hash if first_hash == last_hash else f"{first_hash} – {last_hash}"
 
     # Read the daily dev log
     daily_path = f"src/content/docs/releases/{year}/{month}/{day}.md"
     if os.path.exists(daily_path):
-        with open(daily_path, "r") as f:
+        with open(daily_path, "r", encoding="utf-8") as f:
             dev_log_content = f.read()
     else:
         print(f"No daily log at {daily_path}")
         dev_log_content = ""
 
-    # Generate release summary
-    release_entries = generate_summary(dev_log_content)
-    print(f"Generated {len(release_entries)} release entries")
+    # The dev log IS the release summary — extract entries verbatim
+    release_entries = extract_dev_log_entries(dev_log_content)
+    print(f"Extracted {len(release_entries)} release entries from dev log")
 
-    # Generate index summary
-    index_summary = generate_index_summary(release_entries)
+    # Derive index summary from the first entry
+    index_summary = derive_index_summary(release_entries)
     print(f"Index summary: {index_summary}")
 
     # Update all three files
-    update_daily_log(daily_path, base_tag, builds_str, release_entries)
-    update_monthly(year, month, base_tag, builds_str, release_entries, day)
-    update_index(year, month, base_tag, index_summary)
+    update_daily_log(daily_path, release_tag, builds_str, release_entries)
+    update_monthly(year, month, release_tag, builds_str, release_entries, day)
+    update_index(year, month, release_tag, index_summary)
+
+    # Create the 3-part release tag pointing at the last dev log tag's commit
+    create_release_tag(release_tag, dev_tags[-1])
 
     print("\nDone.")
 

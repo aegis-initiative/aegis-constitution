@@ -10,27 +10,39 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    # Skip commits from bots (prevent loops)
-    if: github.actor != 'github-actions[bot]'
+    # Skip self-initiated runs (prevent loops) and Dependabot pushes
+    # (out of scope for the development log — they're dependency
+    # maintenance, not substantive changes). Dependabot-style commit
+    # messages (chore(deps...) / build(deps...)) are skipped regardless
+    # of who merged the PR.
+    if: >-
+      github.actor != 'github-actions[bot]' &&
+      github.actor != 'dependabot[bot]' &&
+      !startsWith(github.event.head_commit.message, 'chore(deps') &&
+      !startsWith(github.event.head_commit.message, 'build(deps')
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Generate CalVer tag
+      - name: Generate development log tag
         id: calver
         run: |
+          # Per-push tags are always 4-part development log tags.
+          # The 3-part release tag (vYY.M.D) is reserved for the nightly
+          # rollup at the start of the next day.
           YEAR=$(date +'%y')
           MONTH=$(date +'%-m')
           DAY=$(date +'%-d')
-          BASE_TAG="v${YEAR}.${MONTH}.${DAY}"
+          BASE="v${YEAR}.${MONTH}.${DAY}"
 
-          COUNT=0
-          TAG=$BASE_TAG
+          # Start at .1 and increment until we find an unused slot.
+          COUNT=1
+          TAG="${BASE}.${COUNT}"
           while git rev-parse "$TAG" >/dev/null 2>&1; do
             COUNT=$((COUNT + 1))
-            TAG="${BASE_TAG}.${COUNT}"
+            TAG="${BASE}.${COUNT}"
           done
 
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"

@@ -4,23 +4,35 @@ import mdx from '@astrojs/mdx';
 import { execSync } from 'node:child_process';
 
 /**
- * Resolve the CalVer version at build time from the latest git tag.
+ * Resolve the CalVer version at build time from the latest release tag.
  *
- * The header component reads `import.meta.env.AEGIS_VERSION`. By
- * setting `process.env.AEGIS_VERSION` before Astro/Vite loads its env
- * files, we ensure the authoritative source is always the most recent
- * git tag — not a stale dashboard variable or ambient .env file.
+ * Version scheme:
+ *   vYY.M.D.N  (4-part) — development log snapshot, per-push
+ *   vYY.M.D    (3-part) — release, created by the nightly rollup
  *
- * Every production build automatically reflects the latest release
- * with no manual sync step. Local dev can still override by setting
- * AEGIS_VERSION in the shell environment before running `astro dev`.
+ * The header only displays releases. We filter the tag list to 3-part
+ * tags only and return the most recent one by version-sort order.
+ *
+ * This ensures the header reflects the most recent *released* day, not
+ * whatever was just pushed mid-day. A day in progress stays invisible
+ * until its nightly rollup cuts the release tag.
+ *
+ * Local dev can override by setting AEGIS_VERSION in the shell before
+ * running `astro dev`. Falls back to 'dev' if no release tags exist.
  */
 function resolveVersionFromGit() {
   try {
-    return execSync('git describe --tags --abbrev=0', {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim();
+    // No glob argument — Windows cmd.exe doesn't strip single quotes
+    // around 'v*', which makes git match a literal string and return
+    // nothing. Filter the full tag list with the regex instead.
+    const tags = execSync(
+      'git tag --sort=-version:refname',
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] },
+    ).trim().split('\n');
+
+    // Match only 3-part release tags (vYY.M.D), reject 4-part dev logs
+    const releaseTag = tags.find((t) => /^v\d+\.\d+\.\d+$/.test(t.trim()));
+    return releaseTag ? releaseTag.trim() : null;
   } catch {
     return null;
   }
