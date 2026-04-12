@@ -27,6 +27,7 @@ CLI:
 """
 
 import argparse
+import json
 import os
 import re
 import subprocess
@@ -103,6 +104,33 @@ def create_release_tag(release_tag, source_tag):
 
     print(f"Created and pushed release tag {release_tag} → {commit[:7]}")
     return True
+
+
+def update_version_file(release_tag, source_tag):
+    """Write the VERSION file at the repo root.
+
+    VERSION is the authoritative machine-readable record of the current
+    release. The Astro build reads it to populate the header version
+    badge. It's committed in the same rollup commit as the release
+    notes so they're always in sync.
+
+    Idempotent: writing the same tag twice is a no-op diff.
+    """
+    commit = run(f"git rev-list -n 1 {source_tag}")
+    short = commit[:7] if commit else ""
+    released_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    payload = {
+        "tag": release_tag,
+        "commit": short,
+        "released_at": released_at,
+    }
+
+    with open("VERSION", "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2)
+        f.write("\n")
+
+    print(f"Wrote VERSION file: {release_tag} @ {short}")
 
 
 def get_builds_range(tags):
@@ -315,10 +343,13 @@ def main():
     index_summary = derive_index_summary(release_entries)
     print(f"Index summary: {index_summary}")
 
-    # Update all three files
+    # Update all three release-notes files
     update_daily_log(daily_path, release_tag, builds_str, release_entries)
     update_monthly(year, month, release_tag, builds_str, release_entries, day)
     update_index(year, month, release_tag, index_summary)
+
+    # Update the machine-readable VERSION file
+    update_version_file(release_tag, dev_tags[-1])
 
     # Create the 3-part release tag pointing at the last dev log tag's commit
     create_release_tag(release_tag, dev_tags[-1])
