@@ -10,6 +10,7 @@ sidebar:
 
 ### [April](/releases/26/4/)
 
+- [v26.4.12](/releases/26/4/#release--v26412) — Version badge fix, Node 22 upgrade, and nightly release improvements
 - [v26.4.11](/releases/26/4/#release--v26411) — Shared design system adoption and ecosystem nav bar
 
 ### [March](/releases/26/3/)
