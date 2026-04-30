@@ -12,6 +12,7 @@ For the broader project timeline — pre-release milestones, publication history
 
 ### [April](/releases/26/4/)
 
+- [v26.4.29](/releases/26/4/#release--v26429) — Added sitemap and structured data for improved SEO
 - [v26.4.20](/releases/26/4/#release--v26420) — Added broken link reporting from 404 pages
 - [v26.4.13](/releases/26/4/#release--v26413) — Updated design system components and documentation links
 - [v26.4.12](/releases/26/4/#release--v26412) — Version badge fix, Node 22 upgrade, and nightly release improvements
