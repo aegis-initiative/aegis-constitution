@@ -10,6 +10,11 @@ For the broader project timeline — pre-release milestones, publication history
 ## 2026
 
 
+### [May](/releases/26/4/)
+
+- [v26.4.30](/releases/26/4/#release--v26430) — Added ecosystem cross-references and enabled Labs in navigation
+
+
 ### [April](/releases/26/4/)
 
 - [v26.4.29](/releases/26/4/#release--v26429) — Added sitemap and structured data for improved SEO
