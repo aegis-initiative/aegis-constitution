@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <img src="src/assets/AEGIS_logo_aegis-constitution.svg" width="80" alt="AEGIS Constitution">
+  <img src="sites/constitution/src/assets/AEGIS_logo_aegis-constitution.svg" width="80" alt="AEGIS Constitution">
 </p>
 
 <p align="center">

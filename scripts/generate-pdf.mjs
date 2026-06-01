@@ -6,7 +6,7 @@
  *   2. AEGIS_Constitution_print.pdf  — links stripped (plain text, no color)
  *
  * Usage:
- *   node scripts/generate-pdf.mjs              — starts its own server from dist/
+ *   node scripts/generate-pdf.mjs              — starts its own server from sites/constitution/dist/
  *   node scripts/generate-pdf.mjs --port 4322  — uses an already-running server
  */
 
@@ -19,8 +19,9 @@ import { lookup } from 'mime-types';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
-const distDir = path.join(rootDir, 'dist');
-const outputDir = path.join(rootDir, 'public');
+const siteDir = path.join(rootDir, 'sites', 'constitution');
+const distDir = path.join(siteDir, 'dist');
+const outputDir = path.join(siteDir, 'public');
 
 // Parse --port flag
 const args = process.argv.slice(2);
@@ -28,7 +29,7 @@ const portIdx = args.indexOf('--port');
 const externalPort = portIdx >= 0 && args[portIdx + 1] ? parseInt(args[portIdx + 1]) : null;
 
 /**
- * Start a minimal static file server for dist/
+ * Start a minimal static file server for sites/constitution/dist/
  */
 function startServer(port) {
   return new Promise((resolve) => {
@@ -183,7 +184,7 @@ async function main() {
   } else {
     // Start our own server
     if (!existsSync(distDir)) {
-      console.error('Error: dist/ directory not found. Run npm run build first.');
+      console.error('Error: sites/constitution/dist/ not found. Run npm run build from sites/constitution first.');
       process.exit(1);
     }
     port = 4444;

@@ -14,8 +14,8 @@ versioned, citable, openly licensed document set deployed as a public website at
 This repo contains **no implementation code**. It contains constitutional doctrine.
 Every edit here has downstream citation consequences. Treat it accordingly.
 
-The site content lives in `src/content/docs/`. Constitutional text is maintained as
-individual article files in `src/content/docs/constitution/`.
+The site content lives in `sites/constitution/src/content/docs/`. Constitutional text is maintained as
+individual article files in `sites/constitution/src/content/docs/constitution/`.
 
 ---
 
@@ -39,46 +39,25 @@ individual article files in `src/content/docs/constitution/`.
 ## Repo Structure
 
 ```
-.                                ← Root
-├── README.md                    ← GitHub landing page — keep article table current
-├── CLAUDE.md                    ← This file
-├── astro.config.mjs             ← Astro site config — sidebar defined here
-├── package.json                 ← Node dependencies and scripts
-├── tsconfig.json                ← TypeScript config
-├── src/
-│   ├── assets/                  ← Brand assets (SVGs)
-│   │   ├── AEGIS_logo_aegis-constitution.svg
-│   │   ├── AEGIS_wordmark.svg
-│   │   ├── AEGIS_wordmark_dark.svg
-│   │   └── AEGIS_wordmark_light.svg
-│   ├── components/              ← Astro layout components
-│   │   ├── AegisLogo.astro
-│   │   ├── AegisWordmark.astro
-│   │   ├── Aside.astro
-│   │   ├── Breadcrumb.astro
-│   │   ├── Footer.astro
-│   │   ├── Header.astro
-│   │   ├── PrevNext.astro
-│   │   ├── Search.astro
-│   │   ├── Sidebar.astro
-│   │   └── TableOfContents.astro
-│   ├── layouts/
-│   │   └── DocLayout.astro      ← Primary document layout
-│   ├── pages/
-│   │   ├── index.astro          ← Site home
-│   │   └── [...slug].astro      ← Dynamic content routing
-│   ├── content/
-│   │   └── docs/
-│   │       ├── index.mdx        ← Site home (splash page)
-│   │       ├── constitution/    ← 15 files — see table below
-│   │       ├── doctrine/        ← Doctrine articles (index + 5 articles)
-│   │       ├── principles/      ← Principles (index + 8 principles)
-│   │       ├── protocols/       ← Protocols (index + 7 protocols)
-│   │       ├── about/           ← About page
-│   │       ├── contact/         ← Contact page
-│   │       ├── legal/           ← Legal pages (9 pages — see below)
-│   │       └── releases/        ← Release notes
-│   └── content.config.ts        ← Astro content collection config — do not edit
+.                                      ← Root
+├── README.md                          ← GitHub landing page
+├── CLAUDE.md                          ← This file
+├── VERSION                            ← Current release metadata
+├── scripts/                           ← Release + automation scripts
+├── .github/workflows/                 ← Release automation
+└── sites/
+    └── constitution/                  ← Astro site root
+        ├── astro.config.mjs
+        ├── package.json
+        ├── tsconfig.json
+        ├── public/
+        └── src/
+            ├── assets/
+            ├── components/
+            ├── layouts/
+            ├── pages/
+            ├── content/
+            └── content.config.ts
 ```
 
 ### Constitution Content Files
@@ -127,7 +106,7 @@ Do not conflate these terms.
 
 | Term | Definition | Do Not Confuse With |
 |---|---|---|
-| Article files | Astro site content — one file per article in `src/content/docs/constitution/` | N/A |
+| Article files | Astro site content — one file per article in `sites/constitution/src/content/docs/constitution/` | N/A |
 | Tamper-evident | Detectable alteration via append-only + hash-chaining | Immutable — do not use "immutable" for audit records |
 | v0.1.0 | Eight-article constitution — NIST submission anchor | v0.2.0 |
 | v0.1.1 | DOI snapshot — [doi:10.5281/zenodo.19112564](https://doi.org/10.5281/zenodo.19112564) | v0.2.x — Snapshot #2 will have its own DOI |
@@ -143,15 +122,15 @@ This was corrected in v0.2.0. Do not reintroduce "immutable" in any content.
 
 | Topic | Canonical location |
 |---|---|
-| Constitutional text | `src/content/docs/constitution/` (individual article files) |
-| Site content | `src/content/docs/` |
+| Constitutional text | `sites/constitution/src/content/docs/constitution/` (individual article files) |
+| Site content | `sites/constitution/src/content/docs/` |
 | Article table | `README.md` + `constitution/index.md` — must stay in sync |
 | Version history | `constitution/amendments.md` |
 | Normative references | Inline footnotes in individual article files |
-| Site config | `astro.config.mjs` |
-| Sidebar navigation | `src/components/Sidebar.astro` (doc nav + legal nav) |
-| Brand assets | `src/assets/` |
-| Fonts | `public/fonts/` (self-hosted woff2 — no Google Fonts dependency) |
+| Site config | `sites/constitution/astro.config.mjs` |
+| Sidebar navigation | `sites/constitution/src/components/Sidebar.astro` (doc nav + legal nav) |
+| Brand assets | `sites/constitution/src/assets/` |
+| Fonts | `sites/constitution/public/fonts/` (self-hosted woff2 — no Google Fonts dependency) |
 
 ---
 
@@ -281,28 +260,28 @@ Never force-push. Never commit directly to `main`.
 
 ## Build & Deploy
 
-See `package.json` for available scripts. Current commands:
+See `sites/constitution/package.json` for available scripts. Current commands:
 
 ```bash
-npm run dev      # Local dev server at localhost:4321
-npm run build    # Production build to ./dist/
-npm run preview  # Preview production build locally
+npm --prefix sites/constitution run dev      # Local dev server at localhost:4321
+npm --prefix sites/constitution run build    # Production build to ./sites/constitution/dist/
+npm --prefix sites/constitution run preview  # Preview production build locally
 ```
 
 **Node/npm versions are pinned.** Use Node 22.x LTS with npm 10.9.x. The repo
-enforces this via `.nvmrc` (run `nvm use` to switch) and the `engines` field in
-`package.json`. Do **not** regenerate `package-lock.json` under npm 11 — npm 11
+enforces this via `sites/constitution/.nvmrc` (run `nvm use` to switch) and the `engines` field in
+`sites/constitution/package.json`. Do **not** regenerate `sites/constitution/package-lock.json` under npm 11 — npm 11
 and npm 10 serialize optional peer dependencies differently, and a lockfile
 produced by npm 11 will fail `npm ci` on Cloudflare Pages with
 `Missing: @types/node@X.X.X from lock file`. See
 [`.claude/rules/`](./.claude/rules/) for more guardrails.
 
 Deployment is automatic via Cloudflare Pages on push to `main`.
-Build command: `npm run build` | Output: `dist/` | Root: `` (repo root)
+Build command: `npm run build` | Output: `dist/` | Root: `sites/constitution`
 
 Always verify `npm run build` passes cleanly before merging a PR.
 
-`package.json` is protected — changes to scripts or dependencies must trigger a
+`sites/constitution/package.json` is protected — changes to scripts or dependencies must trigger a
 review of README, index, and CLAUDE.md to ensure consistency.
 
 ---

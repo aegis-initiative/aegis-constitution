@@ -8,10 +8,9 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && pagefind --site dist",
-    "postbuild": "cp -r dist/pagefind public/",
+    "build": "astro build && pagefind --site dist && node -e \"const fs=require('node:fs');fs.cpSync('dist/pagefind','public/pagefind',{recursive:true,force:true});\"",
     "preview": "astro preview",
-    "pdf": "node scripts/generate-pdf.mjs",
+    "pdf": "node ../../scripts/generate-pdf.mjs",
     "astro": "astro"
   },
   "dependencies": {
