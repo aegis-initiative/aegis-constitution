@@ -10,6 +10,11 @@ For the broader project timeline — pre-release milestones, publication history
 ## 2026
 
 
+### [June](/releases/26/5/)
+
+- [v26.5.31](/releases/26/5/#release--v26531) — Added security headers and self-hosted navigation script
+
+
 ### [May](/releases/26/4/)
 
 - [v26.4.30](/releases/26/4/#release--v26430) — Added ecosystem cross-references and enabled Labs in navigation
