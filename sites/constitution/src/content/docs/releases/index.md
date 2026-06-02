@@ -10,6 +10,11 @@ For the broader project timeline — pre-release milestones, publication history
 ## 2026
 
 
+### [June](/releases/26/6/)
+
+- [v26.6.1](/releases/26/6/#release--v2661) — Reorganized project structure for multi-site support and expansion
+
+
 ### [June](/releases/26/5/)
 
 - [v26.5.31](/releases/26/5/#release--v26531) — Added security headers and self-hosted navigation script
