@@ -12,6 +12,7 @@ For the broader project timeline — pre-release milestones, publication history
 
 ### [June](/releases/26/6/)
 
+- [v26.6.3](/releases/26/6/#release--v2663) — Added PR template and updated README with AEGIS trademark attribution
 - [v26.6.1](/releases/26/6/#release--v2661) — Reorganized project structure for multi-site support and expansion
 
 
