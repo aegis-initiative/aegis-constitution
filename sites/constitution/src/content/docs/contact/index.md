@@ -48,4 +48,4 @@ This is a small initiative. Responses to discussions and issues are best-effort,
 ---
 
 *AEGIS™* | *"Capability without constraint is not intelligence"™*
-*AEGIS Initiative — Finnoybu IP LLC*
+*AEGIS Initiative — AEGIS Initiative*
