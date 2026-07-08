@@ -10,6 +10,11 @@ For the broader project timeline — pre-release milestones, publication history
 ## 2026
 
 
+### [July](/releases/26/7/)
+
+- [v26.7.7](/releases/26/7/#release--v2677) — Restore ecosystem nav bar and consolidate IP entity naming
+
+
 ### [June](/releases/26/6/)
 
 - [v26.6.3](/releases/26/6/#release--v2663) — Added PR template and updated README with AEGIS trademark attribution
