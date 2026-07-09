@@ -21,18 +21,14 @@ For the broader project timeline — pre-release milestones, publication history
 - [v26.6.1](/releases/26/6/#release--v2661) — Reorganized project structure for multi-site support and expansion
 
 
-### [June](/releases/26/5/)
+### [May](/releases/26/5/)
 
 - [v26.5.31](/releases/26/5/#release--v26531) — Added security headers and self-hosted navigation script
 
 
-### [May](/releases/26/4/)
-
-- [v26.4.30](/releases/26/4/#release--v26430) — Added ecosystem cross-references and enabled Labs in navigation
-
-
 ### [April](/releases/26/4/)
 
+- [v26.4.30](/releases/26/4/#release--v26430) — Added ecosystem cross-references and enabled Labs in navigation
 - [v26.4.29](/releases/26/4/#release--v26429) — Added sitemap and structured data for improved SEO
 - [v26.4.20](/releases/26/4/#release--v26420) — Added broken link reporting from 404 pages
 - [v26.4.13](/releases/26/4/#release--v26413) — Updated design system components and documentation links
