@@ -12,6 +12,7 @@ For the broader project timeline — pre-release milestones, publication history
 
 ### [July](/releases/26/7/)
 
+- [v26.7.9](/releases/26/7/#release--v2679) — Fix incorrect month labels in releases index and May monthly page
 - [v26.7.7](/releases/26/7/#release--v2677) — Restore ecosystem nav bar and consolidate IP entity naming
 
 
