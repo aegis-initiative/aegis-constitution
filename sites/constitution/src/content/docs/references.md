@@ -52,5 +52,5 @@ This page collects all normative references cited across the AEGIS Constitution 
 
 ---
 
-*AEGIS™* | *"Capability without constraint is not intelligence"®*
+*AEGIS™* | *"Capability without constraint is not intelligence"™*
 *AEGIS Initiative — AEGIS Initiative*
