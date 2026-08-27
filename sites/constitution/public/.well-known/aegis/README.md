@@ -102,7 +102,7 @@ The constitution is versioned and citeable. The current version is archived on Z
 
 ## The Canon
 
-> *"Capability without constraint is not intelligence."*
+> *"Capability without constraint is not intelligence."®*
 
 This is the foundational statement of the AEGIS project. It is not a slogan. It is an architectural commitment. Every article, every doctrine, every protocol in this constitution exists to make this statement enforceable.
 

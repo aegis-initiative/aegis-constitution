@@ -27,7 +27,7 @@ This repository contains the **AEGIS Constitution** — the authoritative govern
 
 The Constitution is the public, canonical reference that external parties, researchers, policymakers, and implementers can cite, audit, and build upon.
 
-> **Capability without constraint is not intelligence™**
+> **Capability without constraint is not intelligence®**
 
 ---
 
@@ -102,10 +102,10 @@ On March 7, 2026, AEGIS™ was submitted as an **unsolicited position statement*
 
 Licensed under [CC-BY-SA-4.0](LICENSE).
 
-AEGIS™ and **"Capability without constraint is not intelligence™"** are trademarks of **AEGIS Initiative**.\
+AEGIS™ and **"Capability without constraint is not intelligence®"** are trademarks of **AEGIS Initiative**.\
 Use of AEGIS™ marks in derivative works must not imply endorsement without explicit written permission.
 
 ---
 
-*AEGIS™* | *"Capability without constraint is not intelligence"™*\
+*AEGIS™* | *"Capability without constraint is not intelligence"®*\
 *AEGIS Initiative*

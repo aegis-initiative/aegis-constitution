@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-> *"Capability without constraint is not intelligence."™*
+> *"Capability without constraint is not intelligence."®*
 
 ---
 
