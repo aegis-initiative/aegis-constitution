@@ -23,6 +23,6 @@
     "@astrojs/sitemap": "^3.7.2",
     "mime-types": "^3.0.2",
     "pagefind": "^1.4.0",
-    "puppeteer": "^24.40.0"
+    "puppeteer": "^25.9.0"
   }
 }
