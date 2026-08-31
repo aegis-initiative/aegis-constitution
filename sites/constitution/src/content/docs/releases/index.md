@@ -12,6 +12,7 @@ For the broader project timeline — pre-release milestones, publication history
 
 ### [August](/releases/26/8/)
 
+- [v26.8.30](/releases/26/8/#release--v26830) — Fix GitHub links to point to aegis-constitution repo
 - [v26.8.28](/releases/26/8/#release--v26828) — No user-facing changes
 
 
