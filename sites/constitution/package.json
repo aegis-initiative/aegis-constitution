@@ -17,13 +17,13 @@
     "@aegis-initiative/design-system": "^0.6.0",
     "@astrojs/mdx": "^7.0.8",
     "@pagefind/default-ui": "^1.4.0",
-    "astro": "^7.2.9"
+    "astro": "^7.4.2"
   },
   "devDependencies": {
     "@astrojs/sitemap": "^3.7.2",
     "esbuild": "^0.28.0",
     "mime-types": "^3.0.2",
     "pagefind": "^1.4.0",
-    "puppeteer": "^25.9.0"
+    "puppeteer": "^25.16.0"
   }
 }
