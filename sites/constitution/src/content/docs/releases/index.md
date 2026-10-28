@@ -10,6 +10,11 @@ For the broader project timeline — pre-release milestones, publication history
 ## 2026
 
 
+### [October](/releases/26/10/)
+
+- [v26.10.27](/releases/26/10/#release--v261027) — Fix prev/next order to derive from sidebar instead of separate array
+
+
 ### [August](/releases/26/8/)
 
 - [v26.8.31](/releases/26/8/#release--v26831) — No user-facing changes
