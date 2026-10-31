@@ -12,6 +12,7 @@ For the broader project timeline — pre-release milestones, publication history
 
 ### [October](/releases/26/10/)
 
+- [v26.10.30](/releases/26/10/#release--v261030) — Fix dev log hardcoded year and bare URL formatting
 - [v26.10.29](/releases/26/10/#release--v261029) — Fixed release notes not passing correctly during publishing
 - [v26.10.28](/releases/26/10/#release--v261028) — Fix CSS minification, release workflow tagging, and Node version issues
 - [v26.10.27](/releases/26/10/#release--v261027) — Fix prev/next order to derive from sidebar instead of separate array
