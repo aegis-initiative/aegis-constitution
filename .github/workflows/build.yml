@@ -1,0 +1,11 @@
+name: Build
+on:
+  push:
+    paths: ['sites/constitution/**']
+  pull_request:
+    paths: ['sites/constitution/**']
+jobs:
+  build:
+    uses: aegis-initiative/.github/.github/workflows/astro-build-check.yml@main
+    with:
+      site-dir: sites/constitution
