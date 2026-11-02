@@ -4,6 +4,7 @@ on:
     paths: ['sites/constitution/**']
   pull_request:
     paths: ['sites/constitution/**']
+  workflow_dispatch: {}
 jobs:
   build:
     uses: aegis-initiative/.github/.github/workflows/astro-build-check.yml@main
