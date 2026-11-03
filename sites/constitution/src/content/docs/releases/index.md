@@ -10,6 +10,11 @@ For the broader project timeline — pre-release milestones, publication history
 ## 2026
 
 
+### [November](/releases/26/11/)
+
+- [v26.11.2](/releases/26/11/#release--v26112) — Automated build verification added for pull requests
+
+
 ### [October](/releases/26/10/)
 
 - [v26.10.30](/releases/26/10/#release--v261030) — Fix dev log hardcoded year and bare URL formatting
