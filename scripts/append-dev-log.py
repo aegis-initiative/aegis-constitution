@@ -40,7 +40,7 @@ if not os.path.exists(file_path):
     # Create new daily log
     content = f"""---
 title: "{month_name} {day_int}, 20{year}"
-description: "Development log for {month_name} {day_int}, 20{year}"
+description: "Development log for {month_name} {day_int}, 20{year}: commits and changes merged into the AEGIS Constitution, the open governance charter for constrained intelligence."
 template: doc
 sidebar:
   hidden: true

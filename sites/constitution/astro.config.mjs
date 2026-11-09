@@ -18,7 +18,11 @@ process.env.AEGIS_VERSION = versionRaw ? JSON.parse(versionRaw).tag : 'dev';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://aegis-constitution.com',
-  integrations: [mdx(), sitemap()],
+  integrations: [
+    mdx(),
+    // /print/ is noindex (PDF source page), so keep it out of the sitemap.
+    sitemap({ filter: (page) => !page.endsWith('/print/') }),
+  ],
   vite: {
     // lightningcss (Vite's default CSS minifier as of this Astro/Vite major)
     // drops the standard `backdrop-filter` declaration when it ships
