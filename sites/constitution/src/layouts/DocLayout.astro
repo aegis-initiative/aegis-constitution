@@ -18,6 +18,29 @@ const {
 const pageUrl = new URL(Astro.url.pathname, Astro.site).toString();
 const fullTitle = `${title} | AEGIS Constitution`;
 const isHome = Astro.url.pathname === "/" || Astro.url.pathname === "";
+
+// Search-snippet description. The frontmatter `description` on canonical pages
+// is the article's one-liner (locked/protected text), so it is never edited for
+// SEO. Instead, short one-liners on canonical sections get section context
+// prepended here, in the meta/OG/Twitter tags only. The one-liner itself is
+// reproduced verbatim; structured data keeps the bare one-liner.
+const SECTION_LABELS: Record<string, string> = {
+  constitution: "AEGIS Constitution",
+  doctrine: "AEGIS Doctrine",
+  principles: "AEGIS Principles",
+  protocols: "AEGIS Protocols",
+};
+const SHORT_DESCRIPTION = 120;
+const section = Astro.url.pathname.split("/").filter(Boolean)[0] ?? "";
+const sectionLabel = SECTION_LABELS[section];
+// "Article V — Deny by Default" -> "Article V (Deny by Default)"
+const titleForSnippet = title.replace(/^(.+?)\s+—\s+(.+)$/, "$1 ($2)");
+const metaDescription =
+  sectionLabel && description.length < SHORT_DESCRIPTION
+    ? title.toLowerCase() === section
+      ? `${sectionLabel}: ${description}`
+      : `${sectionLabel}, ${titleForSnippet}: ${description}`
+    : description;
 ---
 
 <!doctype html>
@@ -26,12 +49,12 @@ const isHome = Astro.url.pathname === "/" || Astro.url.pathname === "";
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title} | AEGIS Constitution</title>
-    <meta name="description" content={description} />
+    <meta name="description" content={metaDescription} />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content={`${title} | AEGIS Constitution`} />
-    <meta property="og:description" content={description} />
+    <meta property="og:description" content={metaDescription} />
     <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site).toString()} />
     <meta property="og:image" content={new URL('/OG_image.png', Astro.site).toString()} />
     <meta property="og:image:width" content="1200" />
@@ -41,7 +64,7 @@ const isHome = Astro.url.pathname === "/" || Astro.url.pathname === "";
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={`${title} | AEGIS Constitution`} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:description" content={metaDescription} />
     <meta name="twitter:image" content={new URL('/OG_image.png', Astro.site).toString()} />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

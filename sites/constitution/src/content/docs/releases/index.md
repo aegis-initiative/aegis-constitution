@@ -1,6 +1,6 @@
 ---
 title: Releases
-description: Release history for the AEGIS Constitution site
+description: "Release history for the AEGIS Constitution: monthly release notes and daily development logs for the versioned, openly licensed governance charter."
 sidebar:
   hidden: true
 ---
