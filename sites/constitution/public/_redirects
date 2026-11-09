@@ -1,0 +1,5 @@
+# Legacy root-level article URLs (pre-/constitution/ layout). Google Search
+# Console still reports these as 404s, and older citations may link to them.
+# Permanent redirect to the current constitution article pages.
+/article-:num   /constitution/article-:num/   301
+/article-:num/  /constitution/article-:num/   301
