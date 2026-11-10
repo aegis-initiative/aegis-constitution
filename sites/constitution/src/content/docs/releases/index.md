@@ -12,6 +12,7 @@ For the broader project timeline — pre-release milestones, publication history
 
 ### [November](/releases/26/11/)
 
+- [v26.11.9](/releases/26/11/#release--v26119) — SEO improvements and legacy URL redirects for better discoverability
 - [v26.11.2](/releases/26/11/#release--v26112) — Automated build verification added for pull requests
 
 
